@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "200468096869",
+    "project_id": "giuaki-e96d8",
+    "storage_bucket": "giuaki-e96d8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:200468096869:android:3584ac492dbc2daf49238c",
+        "android_client_info": {
+          "package_name": "com.example.notesapp_sqlitedatabase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnS3VpBnUrOTdPJHnWmrk0t9mtzrtN3TA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
