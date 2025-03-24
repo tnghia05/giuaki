@@ -1,7 +1,6 @@
 package com.example.notesapp_sqlitedatabase.View
 
 
-import android.app.AlertDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
@@ -49,13 +47,16 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.compose.material3.AlertDialog
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun NoteScreen(viewModel: NoteViewModel, onNavigateToDetail: (String) -> Unit){
+fun NoteScreen(
+    viewModel: NoteViewModel,
+    onNavigateToDetail: (String) -> Unit,
+    navController: NavController){
     val filters by viewModel.filters.observeAsState(initial = emptyMap<String, Boolean>())
     val notes by viewModel.filteredNotes.observeAsState(initial = emptyList())
     val searchQuery by viewModel.searchQuery.observeAsState(initial = "")
@@ -90,8 +91,8 @@ fun NoteScreen(viewModel: NoteViewModel, onNavigateToDetail: (String) -> Unit){
                     Icon(Icons.Default.Add, contentDescription = "Thêm ghi chú")
                 }
 
-                AccountMenu(menuExpanded)
-            }
+
+                AccountMenu(menuExpanded = menuExpanded, navController)            }
         }
     ) { paddingValues ->
         Column(
@@ -152,7 +153,7 @@ fun NoteScreen(viewModel: NoteViewModel, onNavigateToDetail: (String) -> Unit){
                         )
                     },
                     modifier = Modifier
-                        .width(195.dp) // Giảm chiều ngang
+                        .width(300.dp) // Giảm chiều ngang
                         .height(55.dp) // Giảm chiều dọc
                         .padding(start = 15.dp),
                     shape = RoundedCornerShape(12.dp), // Bo tròn góc
@@ -176,7 +177,7 @@ fun NoteScreen(viewModel: NoteViewModel, onNavigateToDetail: (String) -> Unit){
 }
 
 @Composable
-fun AccountMenu(menuExpanded: MutableState<Boolean>) {
+fun AccountMenu(menuExpanded: MutableState<Boolean>, navController: NavController) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val showColorPicker = remember { mutableStateOf(false) }
     val user = FirebaseAuth.getInstance().currentUser
@@ -219,10 +220,10 @@ fun AccountMenu(menuExpanded: MutableState<Boolean>) {
             text = { Text("Đăng xuất") },
             onClick = {
                 menuExpanded.value = false
-
-
+                logout(navController) // Gọi hàm đăng xuất
             }
         )
+
 
     }
     if (showColorPicker.value) {
@@ -238,18 +239,7 @@ fun AccountMenu(menuExpanded: MutableState<Boolean>) {
 }
 // hàm đăng xuất
 
-@Composable
-fun logout() {
-    val navController = rememberNavController()
-    FirebaseAuth.getInstance().signOut()
-    navController.navigate("login_screen") {
-        popUpTo("login_screen") { inclusive = true } // Xóa lịch sử để không quay lại màn hình trước
-    }
-}
-@Composable
-fun logoutt(){
-    logout()
-}
+
 
 
 // Hàm xử lý cập nhật bộ lọc
@@ -315,13 +305,7 @@ fun NoteItem(note: Note, onNavigateToDetail: (String) -> Unit, viewModel: NoteVi
                         Icon(Icons.Default.Edit, contentDescription = "Chỉnh sửa", tint = Color(0xFF007AFF))
                     }
 
-                    IconButton(onClick = { viewModel.toggleComplete(note) }, modifier = Modifier.size(20.dp)) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = "Hoàn thành",
-                            tint = if (note.isCompleted) Color(0xFF34C759) else Color.Gray
-                        )
-                    }
+
 
                     IconButton(onClick = { viewModel.toggleFavorite(note) }, modifier = Modifier.size(20.dp)) {
                         Icon(
@@ -364,7 +348,13 @@ fun NoteItem(note: Note, onNavigateToDetail: (String) -> Unit, viewModel: NoteVi
         }
     }
 }
-
+// Hàm đăng xuất không cần @Composable
+fun logout(navController: NavController) {
+    FirebaseAuth.getInstance().signOut()
+    navController.navigate("login_screen") {
+        popUpTo("login_screen") { inclusive = true } // Xóa lịch sử để ngăn quay lại màn hình trước
+    }
+}
 fun formatDate(timestamp: Long): String {
     val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
     return sdf.format(Date(timestamp))

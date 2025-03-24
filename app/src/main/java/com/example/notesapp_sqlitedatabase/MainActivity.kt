@@ -1,7 +1,6 @@
 package com.example.notesapp_sqlitedatabase
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -27,9 +26,9 @@ class MainActivity : ComponentActivity() {
 
             NavHost(navController, startDestination = "login_screen") {
                 composable("note_screen") {
-                    NoteScreen(viewModel) { noteId ->
+                    NoteScreen(viewModel, { noteId ->
                         navController.navigate("note_detail_screen/$noteId")
-                    }
+                    }, navController) // Truyền navController
                 }
                 composable("note_detail_screen/{noteId}") { backStackEntry ->
                     val noteId = backStackEntry.arguments?.getString("noteId") ?: ""
